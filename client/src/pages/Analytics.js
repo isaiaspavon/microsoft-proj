@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { 
   ChartBarIcon, 
   ArrowTrendingUpIcon,
-  GlobeAltIcon
+  GlobeAltIcon,
+  ArrowLeftIcon
 } from '@heroicons/react/24/outline';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import {
@@ -34,6 +36,7 @@ ChartJS.register(
 );
 
 const Analytics = () => {
+  const navigate = useNavigate();
   const [selectedTimeRange, setSelectedTimeRange] = useState('7d');
 
   // Mock data for analytics
@@ -179,11 +182,19 @@ const Analytics = () => {
         animate={{ opacity: 1, y: 0 }}
         className="flex items-center justify-between"
       >
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Analytics</h1>
-          <p className="text-gray-600 mt-1">
-            Deep insights into cloud service performance and trends
-          </p>
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={() => navigate('/')}
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <ArrowLeftIcon className="w-5 h-5 text-gray-600" />
+          </button>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Analytics</h1>
+            <p className="text-gray-600 mt-1">
+              Deep insights into cloud service performance and trends
+            </p>
+          </div>
         </div>
         <div className="flex items-center space-x-3">
           <select

@@ -11,6 +11,8 @@ import Dashboard from './pages/Dashboard';
 import Incidents from './pages/Incidents';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
+import RegionalView from './pages/RegionalView';
+import ServiceHealth from './pages/ServiceHealth';
 import LoadingSpinner from './components/LoadingSpinner';
 
 // Services
@@ -165,6 +167,34 @@ function App() {
                         transition={{ duration: 0.3 }}
                       >
                         <Settings />
+                      </motion.div>
+                    }
+                  />
+                  <Route
+                    path="/regions"
+                    element={
+                      <motion.div
+                        key="regions"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <RegionalView />
+                      </motion.div>
+                    }
+                  />
+                  <Route
+                    path="/service-health"
+                    element={
+                      <motion.div
+                        key="service-health"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <ServiceHealth />
                       </motion.div>
                     }
                   />

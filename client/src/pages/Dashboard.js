@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 // import { useQuery } from 'react-query';
 import { 
   ChartBarIcon, 
@@ -15,11 +17,14 @@ import MetricCard from '../components/MetricCard';
 import StatusGrid from '../components/StatusGrid';
 import UptimeChart from '../components/UptimeChart';
 import IncidentList from '../components/IncidentList';
+import ReportIncidentModal from '../components/ReportIncidentModal';
 
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const { globalMetrics } = useDashboard();
   const [selectedTimeRange, setSelectedTimeRange] = useState('24h');
+  const [showIncidentModal, setShowIncidentModal] = useState(false);
 
   // Fetch regional and service metrics (commented out for demo)
   // const { data: regionalData } = useQuery(
@@ -36,6 +41,13 @@ const Dashboard = () => {
 
   // Mock data for demonstration
   const mockData = getMockData();
+
+  const handleReportIncident = (incidentData) => {
+    // In a real app, this would send the incident to the backend
+    console.log('New incident reported:', incidentData);
+    // Add to mock data or send to API
+    toast.success('Incident reported successfully!');
+  };
 
   const metrics = [
     {
@@ -169,7 +181,10 @@ const Dashboard = () => {
                 <h3 className="text-lg font-semibold text-gray-900">Regional Status</h3>
                 <p className="text-sm text-gray-500">Health status across all regions</p>
               </div>
-              <button className="text-sm text-azure-600 hover:text-azure-700 font-medium">
+              <button 
+                onClick={() => navigate('/regions')}
+                className="text-sm text-azure-600 hover:text-azure-700 font-medium"
+              >
                 View All
               </button>
             </div>
@@ -207,7 +222,10 @@ const Dashboard = () => {
           >
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
             <div className="space-y-3">
-              <button className="w-full flex items-center justify-between p-3 text-left bg-azure-50 hover:bg-azure-100 rounded-lg transition-colors">
+              <button 
+                onClick={() => navigate('/regions')}
+                className="w-full flex items-center justify-between p-3 text-left bg-azure-50 hover:bg-azure-100 rounded-lg transition-colors"
+              >
                 <div className="flex items-center space-x-3">
                   <GlobeAltIcon className="w-5 h-5 text-azure-600" />
                   <span className="text-sm font-medium text-gray-900">View All Regions</span>
@@ -215,7 +233,10 @@ const Dashboard = () => {
                 <ArrowTrendingUpIcon className="w-4 h-4 text-gray-400" />
               </button>
               
-              <button className="w-full flex items-center justify-between p-3 text-left bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors">
+              <button 
+                onClick={() => setShowIncidentModal(true)}
+                className="w-full flex items-center justify-between p-3 text-left bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors"
+              >
                 <div className="flex items-center space-x-3">
                   <ExclamationTriangleIcon className="w-5 h-5 text-orange-600" />
                   <span className="text-sm font-medium text-gray-900">Report Incident</span>
@@ -223,7 +244,10 @@ const Dashboard = () => {
                 <ArrowTrendingUpIcon className="w-4 h-4 text-gray-400" />
               </button>
               
-              <button className="w-full flex items-center justify-between p-3 text-left bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
+              <button 
+                onClick={() => navigate('/service-health')}
+                className="w-full flex items-center justify-between p-3 text-left bg-green-50 hover:bg-green-100 rounded-lg transition-colors"
+              >
                 <div className="flex items-center space-x-3">
                   <ServerIcon className="w-5 h-5 text-green-600" />
                   <span className="text-sm font-medium text-gray-900">Service Health</span>
@@ -269,6 +293,13 @@ const Dashboard = () => {
           </motion.div>
         </div>
       </div>
+
+      {/* Report Incident Modal */}
+      <ReportIncidentModal
+        isOpen={showIncidentModal}
+        onClose={() => setShowIncidentModal(false)}
+        onSubmit={handleReportIncident}
+      />
     </div>
   );
 };

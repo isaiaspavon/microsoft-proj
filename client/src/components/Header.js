@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { 
   Bars3Icon, 
   BellIcon, 
@@ -12,6 +13,7 @@ import { useDashboard } from '../context/DashboardContext';
 import { useSocket } from '../hooks/useSocket';
 
 const Header = ({ onMenuClick }) => {
+  const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const { globalMetrics, realTimeUpdates, toggleRealTime } = useDashboard();
   const socket = useSocket();
@@ -143,7 +145,10 @@ const Header = ({ onMenuClick }) => {
           </div>
 
           {/* Settings */}
-          <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+          <button 
+            onClick={() => navigate('/settings')}
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          >
             <Cog6ToothIcon className="w-6 h-6 text-gray-600" />
           </button>
 

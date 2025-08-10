@@ -1,20 +1,33 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { 
   PlusIcon, 
   FunnelIcon, 
   ExclamationTriangleIcon,
   ClockIcon,
-  UserGroupIcon
+  UserGroupIcon,
+  ArrowLeftIcon
 } from '@heroicons/react/24/outline';
 import { getMockData } from '../services/api';
 import IncidentList from '../components/IncidentList';
+import ReportIncidentModal from '../components/ReportIncidentModal';
 
 const Incidents = () => {
+  const navigate = useNavigate();
   const [selectedSeverity, setSelectedSeverity] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedRegion, setSelectedRegion] = useState('all');
+  const [showIncidentModal, setShowIncidentModal] = useState(false);
   const mockData = getMockData();
+
+  const handleReportIncident = (incidentData) => {
+    // In a real app, this would send the incident to the backend
+    console.log('New incident reported:', incidentData);
+    // Add to mock data or send to API
+    toast.success('Incident reported successfully!');
+  };
 
   const filteredIncidents = mockData.incidents.filter(incident => {
     if (selectedSeverity !== 'all' && incident.severity !== selectedSeverity) return false;
@@ -53,15 +66,24 @@ const Incidents = () => {
         animate={{ opacity: 1, y: 0 }}
         className="flex items-center justify-between"
       >
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Incidents</h1>
-          <p className="text-gray-600 mt-1">
-            Monitor and manage service incidents across all regions
-          </p>
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={() => navigate('/')}
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <ArrowLeftIcon className="w-5 h-5 text-gray-600" />
+          </button>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Incidents</h1>
+            <p className="text-gray-600 mt-1">
+              Monitor and manage service incidents across all regions
+            </p>
+          </div>
         </div>
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          onClick={() => setShowIncidentModal(true)}
           className="flex items-center space-x-2 px-4 py-2 bg-azure-600 text-white rounded-lg hover:bg-azure-700 transition-colors"
         >
           <PlusIcon className="w-5 h-5" />
@@ -214,6 +236,13 @@ const Incidents = () => {
         
         <IncidentList incidents={filteredIncidents} />
       </motion.div>
+
+      {/* Report Incident Modal */}
+      <ReportIncidentModal
+        isOpen={showIncidentModal}
+        onClose={() => setShowIncidentModal(false)}
+        onSubmit={handleReportIncident}
+      />
     </div>
   );
 };

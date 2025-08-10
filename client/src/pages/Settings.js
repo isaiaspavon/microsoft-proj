@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { 
   Cog6ToothIcon,
   BellIcon,
   GlobeAltIcon,
-  ShieldCheckIcon
+  ShieldCheckIcon,
+  ArrowLeftIcon
 } from '@heroicons/react/24/outline';
 
 const Settings = () => {
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState({
     email: true,
     slack: false,
@@ -30,6 +34,43 @@ const Settings = () => {
     logAnalytics: false,
     eventHub: false,
   });
+
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+  const [apiKey, setApiKey] = useState('');
+
+  // Load settings from localStorage on component mount
+  useEffect(() => {
+    const savedSettings = localStorage.getItem('cloudinsight-settings');
+    if (savedSettings) {
+      const parsed = JSON.parse(savedSettings);
+      setNotifications(parsed.notifications || notifications);
+      setDisplay(parsed.display || display);
+      setIntegrations(parsed.integrations || integrations);
+    }
+  }, [notifications, display, integrations]);
+
+  const handleSaveSettings = () => {
+    const settings = {
+      notifications,
+      display,
+      integrations,
+      lastSaved: new Date().toISOString()
+    };
+    
+    localStorage.setItem('cloudinsight-settings', JSON.stringify(settings));
+    toast.success('Settings saved successfully!');
+  };
+
+  const handleEnable2FA = () => {
+    setTwoFactorEnabled(true);
+    toast.success('Two-factor authentication enabled!');
+  };
+
+  const handleGenerateApiKey = () => {
+    const newApiKey = 'ci_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now().toString(36);
+    setApiKey(newApiKey);
+    toast.success('API key generated successfully!');
+  };
 
   const handleNotificationChange = (key) => {
     setNotifications(prev => ({
@@ -60,11 +101,19 @@ const Settings = () => {
         animate={{ opacity: 1, y: 0 }}
         className="flex items-center justify-between"
       >
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-          <p className="text-gray-600 mt-1">
-            Configure your CloudInsight dashboard preferences
-          </p>
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={() => navigate('/')}
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <ArrowLeftIcon className="w-5 h-5 text-gray-600" />
+          </button>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
+            <p className="text-gray-600 mt-1">
+              Configure your CloudInsight dashboard preferences
+            </p>
+          </div>
         </div>
       </motion.div>
 
@@ -257,10 +306,24 @@ const Settings = () => {
                 Two-Factor Authentication
               </label>
               <div className="flex items-center space-x-4">
-                <button className="px-4 py-2 bg-azure-600 text-white rounded-lg hover:bg-azure-700 transition-colors">
-                  Enable
-                </button>
-                <span className="text-sm text-gray-500">Currently disabled</span>
+                {!twoFactorEnabled ? (
+                  <>
+                    <button 
+                      onClick={handleEnable2FA}
+                      className="px-4 py-2 bg-azure-600 text-white rounded-lg hover:bg-azure-700 transition-colors"
+                    >
+                      Enable
+                    </button>
+                    <span className="text-sm text-gray-500">Currently disabled</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium">
+                      Enabled
+                    </span>
+                    <span className="text-sm text-gray-500">Two-factor authentication is active</span>
+                  </>
+                )}
               </div>
             </div>
 
@@ -269,10 +332,29 @@ const Settings = () => {
                 API Access
               </label>
               <div className="flex items-center space-x-4">
-                <button className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
-                  Generate Key
-                </button>
-                <span className="text-sm text-gray-500">No active API keys</span>
+                {!apiKey ? (
+                  <>
+                    <button 
+                      onClick={handleGenerateApiKey}
+                      className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                    >
+                      Generate Key
+                    </button>
+                    <span className="text-sm text-gray-500">No active API keys</span>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex-1">
+                      <input
+                        type="text"
+                        value={apiKey}
+                        readOnly
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50"
+                      />
+                    </div>
+                    <span className="text-sm text-green-600 font-medium">Active</span>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -286,7 +368,10 @@ const Settings = () => {
         transition={{ delay: 0.3 }}
         className="flex justify-end"
       >
-        <button className="px-6 py-3 bg-azure-600 text-white rounded-lg hover:bg-azure-700 transition-colors font-medium">
+        <button 
+          onClick={handleSaveSettings}
+          className="px-6 py-3 bg-azure-600 text-white rounded-lg hover:bg-azure-700 transition-colors font-medium"
+        >
           Save Settings
         </button>
       </motion.div>
